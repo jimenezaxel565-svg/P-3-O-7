@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Comparación de proporciones · Axel Jimenez</title>
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <!-- MathJax para LaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #f5f8fc, #eef2f7);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .premium-card {
+            max-width: 1280px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+        .premium-card:hover {
+            box-shadow: 0 35px 55px -18px rgba(0, 0, 0, 0.25);
+        }
+        .card-header {
+            padding: 2rem 2.5rem 1rem 2.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .title-section h1 {
+            font-size: 1.9rem;
+            font-weight: 590;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1f3b4c, #1a5f7a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+        }
+        .subhead {
+            font-size: 1rem;
+            color: #5d6e82;
+            font-weight: 440;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eef3fc;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #2a6285;
+            margin-top: 0.8rem;
+            font-weight: 470;
+        }
+        .chart-wrapper {
+            padding: 1rem 1.8rem 0rem 1.8rem;
+        }
+        .chart-container {
+            width: 100%;
+            height: 460px;
+            background: #ffffff;
+            border-radius: 36px;
+        }
+        .insight-panel {
+            padding: 0.2rem 2.5rem 2rem 2.5rem;
+        }
+        .explanation {
+            background: #f9fbfe;
+            border-radius: 28px;
+            padding: 1.4rem 2rem;
+            border: 0.5px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: space-between;
+        }
+        .left-stats {
+            flex: 2;
+            min-width: 220px;
+        }
+        .right-equation {
+            flex: 1.5;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eef2f8;
+        }
+        .explanation p {
+            line-height: 1.5;
+            color: #1e2f3c;
+            font-size: 0.95rem;
+            margin-bottom: 0.7rem;
+        }
+        .explanation strong {
+            font-weight: 590;
+            color: #1c5f7e;
+        }
+        .formula-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 0.6rem 1rem;
+            margin: 0.9rem 0;
+            border-left: 3px solid #2c7da0;
+            font-family: 'SF Mono', Menlo, monospace;
+            font-size: 0.9rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .stat-item {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 0.5rem 0.8rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1d5a7c;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #6c7e94;
+        }
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+        .btn-premium {
+            background: #1d5a7c;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 520;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .btn-premium:hover {
+            background: #0e4562;
+            transform: scale(0.98);
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #8d9aaf;
+            padding: 1rem 2rem 1.6rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            background: #ffffffd4;
+        }
+        i.fa {
+            color: #1f6e93;
+        }
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .card-header { padding: 1.2rem 1.5rem; }
+            .chart-wrapper { padding: 0.5rem 1rem; }
+            .insight-panel { padding: 0.2rem 1.5rem 1.5rem; }
+            .chart-container { height: 340px; }
+            .explanation { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+<div class="premium-card">
+    <div class="card-header">
+        <div class="title-section">
+            <h1>Prueba de dos proporciones · Clientes extranjeros vs nacionales</h1>
+            <div class="subhead">
+                \( H_0: p_1 = p_2 \) &nbsp; vs &nbsp; \( H_1: p_1 \neq p_2 \) &nbsp; (bilateral)
+            </div>
+            <div class="badge">
+                <i class="fas fa-user-check"></i> Axel Jimenez, 27870662
+                <i class="fas fa-chart-simple" style="margin-left: 8px;"></i> Nivel de significación \( \alpha = 0.01 \) · \( Z_{crítico} = \pm 2.576 \)
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-wrapper">
+        <div id="proportionZChart" class="chart-container"></div>
+    </div>
+
+    <div class="insight-panel">
+        <div class="explanation">
+            <div class="left-stats">
+                <p><i class="fas fa-calculator"></i> <strong>Estadístico de prueba</strong><br>
+                Con valores ilustrativos: \( \hat{p}_1 = 65/100 = 0.65 \), \( \hat{p}_2 = 77/110 \approx 0.70 \), proporción combinada \( \hat{p} \approx 0.6762 \).  
+                El estadístico \( Z \) calculado es:</p>
+                <div class="formula-card">
+                    \[
+                    Z = \frac{0.65 - 0.70}{\sqrt{0.6762 \cdot 0.3238 \cdot \left(\frac{1}{100}+\frac{1}{110}\right)}} \approx -0.773
+                    \]
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-value">\( Z = -0.773 \)</div><div class="stat-label">Observado</div></div>
+                    <div class="stat-item"><div class="stat-value">\( Z_{crítico} = \pm 2.576 \)</div><div class="stat-label">Valores críticos</div></div>
+                    <div class="stat-item"><div class="stat-value">p-valor ≈ 0.4394</div><div class="stat-label"> > α</div></div>
+                    <div class="stat-item"><div class="stat-value">No se rechaza \( H_0 \)</div><div class="stat-label">Decisión</div></div>
+                </div>
+                <p style="margin-top: 0.8rem;">El valor \( Z \) observado cae dentro de la región de aceptación (entre -2.576 y 2.576), por lo que no hay evidencia suficiente para concluir que las proporciones sean diferentes. El p-valor (0.4394) es mayor que \( \alpha = 0.01 \), reforzando la decisión.</p>
+            </div>
+            <div class="right-equation">
+                <i class="fas fa-chart-line"></i> <strong>Interpretación final</strong><br>
+                <div style="margin-top: 0.8rem; font-size:0.9rem;">
+                Con un nivel de significación del 1%, <strong>no existe evidencia estadística suficiente</strong> para afirmar que la proporción de clientes extranjeros que compran pantalones sea diferente a la de los clientes nacionales. El comportamiento de compra es similar entre ambos grupos.
+                </div>
+                <div style="margin-top: 1rem; font-size:0.8rem; color:#4f6f8f;">
+                <i class="fas fa-info-circle"></i> Valores ilustrativos: \( x_1 = 65 \), \( n_1 = 100 \), \( x_2 = 77 \), \( n_2 = 110 \). El gráfico muestra la distribución normal estándar bajo \( H_0 \).
+                </div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="exportChartBtn" class="btn-premium">
+                <i class="fas fa-download"></i> Exportar gráfico (PNG)
+            </button>
+        </div>
+    </div>
+    <footer>
+        Distribución \( N(0,1) \) · Prueba bilateral para dos proporciones · Región de rechazo: \( |Z| \ge 2.576 \) · \( \alpha = 0.01 \)
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // Parámetros
+        const Z_CRIT = 2.576;    // valor crítico bilateral para α=0.01
+        const Z_OBS = -0.773;     // estadístico calculado
+        
+        // Función densidad normal estándar
+        function pdf(x) {
+            return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * x * x);
+        }
+        
+        // Rango de visualización
+        const start = -3.8;
+        const end = 3.8;
+        const step = 0.04;
+        
+        const fullCurve = [];
+        const leftTail = [];
+        const rightTail = [];
+        
+        for (let x = start; x <= end + 1e-8; x += step) {
+            let y = pdf(x);
+            fullCurve.push([parseFloat(x.toFixed(4)), y]);
+            if (x <= -Z_CRIT) leftTail.push([parseFloat(x.toFixed(4)), y]);
+            if (x >= Z_CRIT) rightTail.push([parseFloat(x.toFixed(4)), y]);
+        }
+        
+        // Puntos exactos en los límites críticos para un correcto sombreado
+        const yLeftCrit = pdf(-Z_CRIT);
+        const yRightCrit = pdf(Z_CRIT);
+        if (!leftTail.some(p => Math.abs(p[0] + Z_CRIT) < 0.02)) leftTail.push([-Z_CRIT, yLeftCrit]);
+        if (!rightTail.some(p => Math.abs(p[0] - Z_CRIT) < 0.02)) rightTail.push([Z_CRIT, yRightCrit]);
+        leftTail.sort((a,b) => a[0] - b[0]);
+        rightTail.sort((a,b) => a[0] - b[0]);
+        
+        // Líneas verticales punteadas para los valores críticos
+        const leftLine = [[-Z_CRIT, 0], [-Z_CRIT, yLeftCrit]];
+        const rightLine = [[Z_CRIT, 0], [Z_CRIT, yRightCrit]];
+        
+        const dom = document.getElementById('proportionZChart');
+        const myChart = echarts.init(dom);
+        
+        const option = {
+            backgroundColor: '#ffffff',
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' },
+                formatter: function(params) {
+                    if (!params || params.length === 0) return '';
+                    const point = params[0];
+                    const xv = point.value[0];
+                    const yv = point.value[1];
+                    return `<strong>Z = ${xv.toFixed(3)}</strong><br/>Densidad: ${yv.toFixed(4)}`;
+                }
+            },
+            grid: {
+                left: '6%',
+                right: '6%',
+                top: '12%',
+                bottom: '8%',
+                containLabel: false
+            },
+            xAxis: {
+                name: 'Estadístico Z',
+                nameLocation: 'middle',
+                nameGap: 35,
+                axisLine: { lineStyle: { color: '#b3c7db' } },
+                axisTick: { show: false },
+                axisLabel: { fontSize: 11, color: '#3e5e7c' }
+            },
+            yAxis: {
+                name: 'Densidad de probabilidad',
+                nameLocation: 'middle',
+                nameGap: 48,
+                axisLine: { show: false },
+                splitLine: { lineStyle: { type: 'dashed', color: '#e2e9f2' } }
+            },
+            series: [
+                {
+                    name: 'Distribución N(0,1)',
+                    type: 'line',
+                    data: fullCurve,
+                    lineStyle: { width: 2.3, color: '#1f6e93' },
+                    symbol: 'none',
+                    areaStyle: { opacity: 0 }
+                },
+                {
+                    name: 'Región de rechazo (α=0.01)',
+                    type: 'line',
+                    data: leftTail,
+                    lineStyle: { width: 0 },
+                    symbol: 'none',
+                    areaStyle: { color: '#e3624a', opacity: 0.55 }
+                },
+                {
+                    name: 'Región de rechazo derecha',
+                    type: 'line',
+                    data: rightTail,
+                    lineStyle: { width: 0 },
+                    symbol: 'none',
+                    areaStyle: { color: '#e3624a', opacity: 0.55 }
+                },
+                {
+                    name: 'Valor crítico -2.576',
+                    type: 'line',
+                    data: leftLine,
+                    lineStyle: { width: 1.5, color: '#bc6b50', type: 'dashed' },
+                    symbol: 'none'
+                },
+                {
+                    name: 'Valor crítico +2.576',
+                    type: 'line',
+                    data: rightLine,
+                    lineStyle: { width: 1.5, color: '#bc6b50', type: 'dashed' },
+                    symbol: 'none'
+                },
+                {
+                    name: 'Z observado',
+                    type: 'scatter',
+                    data: [[Z_OBS, pdf(Z_OBS)]],
+                    symbol: 'circle',
+                    symbolSize: 10,
+                    itemStyle: { color: '#1c6d9e', borderColor: '#ffffff', borderWidth: 2 },
+                    label: {
+                        show: true,
+                        formatter: `Z = ${Z_OBS.toFixed(3)}`,
+                        position: 'top',
+                        fontWeight: 500,
+                        color: '#1d5f80',
+                        fontSize: 11
+                    }
+                }
+            ],
+            legend: {
+                data: ['N(0,1)', 'Región de rechazo (α = 0.01)', 'Límites críticos ±2.576', 'Z observado'],
+                left: 'left',
+                top: 10,
+                itemWidth: 24,
+                itemHeight: 12,
+                textStyle: { color: '#326883', fontSize: 11 }
+            },
+            graphic: [
+                {
+                    type: 'text',
+                    left: '11%',
+                    top: '68%',
+                    style: { text: '-2.576', fill: '#bc5c3c', fontSize: 12, fontWeight: 500 }
+                },
+                {
+                    type: 'text',
+                    right: '11%',
+                    top: '68%',
+                    style: { text: '+2.576', fill: '#bc5c3c', fontSize: 12, fontWeight: 500 }
+                }
+            ]
+        };
+        
+        myChart.setOption(option);
+        
+        // Exportar imagen
+        document.getElementById('exportChartBtn').addEventListener('click', () => {
+            const url = myChart.getDataURL({ type: 'png', pixelRatio: 2.5, backgroundColor: '#ffffff' });
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'comparacion_proporciones_axel_jimenez.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        window.addEventListener('resize', () => myChart.resize());
+    })();
+</script>
+</body>
+</html>
